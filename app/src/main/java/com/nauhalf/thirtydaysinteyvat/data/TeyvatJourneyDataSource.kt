@@ -3,7 +3,7 @@ package com.nauhalf.thirtydaysinteyvat.data
 import com.nauhalf.thirtydaysinteyvat.R
 import com.nauhalf.thirtydaysinteyvat.model.TeyvatJourney
 
-object TeyvarJourneyDataSource {
+object TeyvatJourneyDataSource {
     val list = listOf(
         TeyvatJourney(
             imageRes = R.drawable.teyvat_1,
