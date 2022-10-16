@@ -1,8 +1,13 @@
+@file:OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialApi::class)
+
 package com.nauhalf.thirtydaysinteyvat
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,12 +17,18 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
@@ -56,7 +67,12 @@ fun TeyvatJourneyList(modifier: Modifier = Modifier) {
         contentPadding = PaddingValues(16.dp),
         modifier = modifier
     ) {
-        items(TeyvatJourneyDataSource.list) { item ->
+        itemsIndexed(
+            items = TeyvatJourneyDataSource.list,
+            key = { index, _ ->
+                index
+            }
+        ) { _, item ->
             TeyvatJourneyCard(teyvatJourney = item)
         }
     }
@@ -64,27 +80,40 @@ fun TeyvatJourneyList(modifier: Modifier = Modifier) {
 
 @Composable
 fun TeyvatJourneyCard(teyvatJourney: TeyvatJourney, modifier: Modifier = Modifier) {
+    var expanded by rememberSaveable {
+        mutableStateOf(false)
+    }
     Card(
         modifier = modifier,
         elevation = 4.dp,
+        onClick = {
+            expanded = !expanded
+        }
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .padding(16.dp)
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow,
+                    )
+                ),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             TeyvatJourneyTitle(
                 text = stringResource(id = teyvatJourney.titleRes),
-                modifier = Modifier,
             )
             TeyvatJourneyPhoto(
                 image = painterResource(id = teyvatJourney.imageRes),
                 title = stringResource(
                     id = teyvatJourney.titleRes),
-                modifier = Modifier,
             )
-            TeyvatJourneyDescription(
-                description = stringResource(id = teyvatJourney.descriptionRes),
-                modifier = Modifier,
-            )
+            if (expanded) {
+                TeyvatJourneyDescription(
+                    description = stringResource(id = teyvatJourney.descriptionRes),
+                )
+            }
         }
     }
 }
@@ -93,6 +122,7 @@ fun TeyvatJourneyCard(teyvatJourney: TeyvatJourney, modifier: Modifier = Modifie
 fun TeyvatJourneyTitle(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
+        style = MaterialTheme.typography.h6,
         modifier = modifier,
     )
 }
@@ -101,7 +131,7 @@ fun TeyvatJourneyTitle(text: String, modifier: Modifier = Modifier) {
 fun TeyvatJourneyPhoto(image: Painter, title: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp)),
+            .clip(RoundedCornerShape(4.dp)),
     ) {
         Image(painter = image, contentDescription = title,
             modifier = Modifier
@@ -114,5 +144,9 @@ fun TeyvatJourneyPhoto(image: Painter, title: String, modifier: Modifier = Modif
 
 @Composable
 fun TeyvatJourneyDescription(description: String, modifier: Modifier = Modifier) {
-    Text(text = description, modifier = modifier)
+    Text(
+        text = description,
+        style = MaterialTheme.typography.caption,
+        modifier = modifier,
+    )
 }

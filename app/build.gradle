@@ -4,6 +4,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\Naufa\\AndroidStudioProjects\\30DaysinTeyvat2\\keystore.jks')
+            storePassword 'keystore'
+            keyAlias 'key0'
+            keyPassword 'keystore'
+        }
+    }
     namespace 'com.nauhalf.thirtydaysinteyvat'
     compileSdk 32
 
@@ -24,6 +32,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
